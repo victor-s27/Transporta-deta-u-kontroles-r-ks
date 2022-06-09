@@ -1,47 +1,15 @@
-from cProfile import label
 import datetime
 import sqlite3 as sl
-import tkinter.filedialog as fd
 import tkinter as tk
-from tkinter import Canvas, Image
+from tkinter import Image
 from PIL import Image, ImageTk
 
-con = sl.connect('my-test.db')
+con = sl.connect('DB/my-test.db')
 
-
-##############################################################################
-
-#       Datu bāzes izveide      - nepieciešams pirmo reizi
-
-
-# with con:
-#    con.execute("""
-#        CREATE TABLE DETALAS (
-#            id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-#            nosaukums TEXT,
-#            nobraukums INTEGER,
-#            datums TEXT
-#        );
-#    """)
-
-
-# sql = 'INSERT INTO DETALAS (id, nosaukums, nobraukums, datums) values(?, ?, ?, ?)'
-# data = [
-#    (1, 'Odometrs', 234681, "2022-05-26" ),
-#    (2, 'Ella', 225681, "2021-05-13"),
-#    (3, 'Filtri', 229681, "2022-01-22"),
-#    (4, 'Suporti', 226681, "2022-02-22"),
-#    (5, 'Kluci', 229991, "2022-03-22"),
-#    (6, 'Skidrums', 229981, "2021-09-22")
-# ]
-
-# with con:
-#    con.executemany(sql, data)
-
-
-##############################################################################
-
-
+with con:
+    result = con.execute("SELECT * FROM Connection ORDER BY connection_id DESC LIMIT 1")
+    for row in result:
+        connection_user_id = row[1]
 
 # Dimensijas + mainīgie
 HEIGHT = 900
@@ -66,7 +34,7 @@ canvas.pack()
 
 
 # BackGround picture
-image = Image.open("backGround.png")
+image = Image.open("Pictures/backGround.png")
 resize_image = image.resize((WIDTH, HEIGHT))
 img = ImageTk.PhotoImage(resize_image)
 labelBG = tk.Label(image=img)
@@ -92,7 +60,7 @@ def odometrsLogs():
         odometrsZinojums.place(relheight=0.2, relwidth=0.7, relx =0.15, rely=0.15)
 
         with con:
-            data = con.execute("SELECT nobraukums FROM Cars WHERE id_user = 1 AND nosaukums = 'Odometrs' ")
+            data = con.execute("SELECT nobraukums FROM Cars WHERE id_user = '%d' AND nosaukums = 'Odometrs' " % connection_user_id)
             for row in data:
                 x = row[0]
 
@@ -102,7 +70,7 @@ def odometrsLogs():
         odometrsIevade.place(relheight=0.05, relwidth=0.5, relx=0.25, rely=0.35)
 
         with con:
-            data = con.execute("SELECT datums FROM Cars WHERE id_user = 1 AND nosaukums = 'Odometrs' ")
+            data = con.execute("SELECT datums FROM Cars WHERE id_user = '%d' AND nosaukums = 'Odometrs' " % connection_user_id)
             for row in data:
                 y = row[0]
         
@@ -127,7 +95,7 @@ def odometrsLogs():
             global atverts
             nobraukums = odometrsRadijums.get()
 
-            sql = str("UPDATE Cars SET nobraukums='"+str(nobraukums)+ "'  WHERE id_user = 1 AND nosaukums = 'Odometrs'")
+            sql = str("UPDATE Cars SET nobraukums='"+str(nobraukums)+ "'  WHERE id_user = '%d' AND nosaukums = 'Odometrs'" % connection_user_id)
             con.execute(sql)
             con.commit()
 
@@ -135,7 +103,7 @@ def odometrsLogs():
             dateTd = datetime.datetime.today().strftime('%Y-%m-%d')
             dateTd = str(dateTd)
 
-            sql = str("UPDATE Cars SET datums='"+ dateTd + "'  WHERE id_user = 1 AND nosaukums = 'Odometrs'")
+            sql = str("UPDATE Cars SET datums='"+ dateTd + "'  WHERE id_user = '%d' AND nosaukums = 'Odometrs'" % connection_user_id)
             con.execute(sql)
             con.commit()
 
@@ -148,7 +116,7 @@ def odometrsLogs():
 virsraksts1 = tk.Label(root, text="Nobraukums:", justify='center',  font=fonts1, bg='#FFFFFF')
 virsraksts1.place( relx=0.35, rely=0.18)
 
-image2 = Image.open("aCmwIm9bEIS1.png")
+image2 = Image.open("Pictures/aCmwIm9bEIS1.png")
 resize_image2 = image2.resize((50, 50))
 img2 = ImageTk.PhotoImage(resize_image2)
 button1 = tk.Button(image=img2, command = lambda: odometrsLogs())
@@ -172,7 +140,7 @@ def ellaLogs():
     ellaZinojums.place(relheight=0.2, relwidth=0.7, relx =0.15, rely=0.15)
 
     with con:
-        data = con.execute("SELECT nobraukums FROM Cars WHERE id_user = 1 AND nosaukums = 'Ella' ")
+        data = con.execute("SELECT nobraukums FROM Cars WHERE id_user = '%d' AND nosaukums = 'Ella' " % connection_user_id)
         for row in data:
             x = row[0]
 
@@ -184,7 +152,7 @@ def ellaLogs():
     
 
     with con:
-        data = con.execute("SELECT datums FROM Cars WHERE id_user = 1 AND nosaukums = 'Ella' ")
+        data = con.execute("SELECT datums FROM Cars WHERE id_user = '%d' AND nosaukums = 'Ella' " % connection_user_id)
         for row in data:
             y = row[0]
 
@@ -209,14 +177,14 @@ def ellaLogs():
         nobraukums = ellaRadijums.get()
 
 
-        sql = str("UPDATE Cars SET nobraukums='"+str(nobraukums)+ "'  WHERE id_user = 1 AND nosaukums = 'Ella'")
+        sql = str("UPDATE Cars SET nobraukums='"+str(nobraukums)+ "'  WHERE id_user = '%d' AND nosaukums = 'Ella'" % connection_user_id)
         con.execute(sql)
         con.commit()
 
         dateTd = datetime.datetime.today().strftime('%Y-%m-%d')
         dateTd = str(dateTd)
 
-        sql = str("UPDATE Cars SET datums='"+ dateTd + "'  WHERE id_user = 1 AND nosaukums = 'Ella'")
+        sql = str("UPDATE Cars SET datums='"+ dateTd + "'  WHERE id_user = '%d' AND nosaukums = 'Ella'" % connection_user_id)
         con.execute(sql)
         con.commit()
 
@@ -229,7 +197,7 @@ def ellaLogs():
 virsraksts2 = tk.Label(root, text="Dzinēja eļļas un filtra maiņā veikta:", justify='center',  font=fonts1, bg='#FFFFFF')
 virsraksts2.place( relx=0.05, rely=0.34)
 
-image3 = Image.open("aCmwIm9bEIS1.png")
+image3 = Image.open("Pictures/aCmwIm9bEIS1.png")
 resize_image3 = image3.resize((50, 50))
 img3 = ImageTk.PhotoImage(resize_image3)
 button2 = tk.Button(image=img3, command = lambda: ellaLogs())
@@ -256,7 +224,7 @@ def filtriLogs():
         filtriZinojums.place(relheight=0.2, relwidth=0.7, relx =0.15, rely=0.15)
 
         with con:
-            data = con.execute("SELECT nobraukums FROM Cars WHERE id_user = 1 AND nosaukums = 'Filtri' ")
+            data = con.execute("SELECT nobraukums FROM Cars WHERE id_user = '%d' AND nosaukums = 'Filtri' " % connection_user_id)
             for row in data:
                 x = row[0]
 
@@ -266,7 +234,7 @@ def filtriLogs():
         filtriIevade.place(relheight=0.05, relwidth=0.5, relx=0.25, rely=0.35)
       
         with con:
-            data = con.execute("SELECT datums FROM Cars WHERE id_user = 1 AND nosaukums = 'Filtri' ")
+            data = con.execute("SELECT datums FROM Cars WHERE id_user = '%d' AND nosaukums = 'Filtri' " % connection_user_id)
             for row in data:
                 y = row[0]
 
@@ -293,14 +261,14 @@ def filtriLogs():
             atverts = 0
 
             nobraukums = filtriRadijums.get()
-            sql = str("UPDATE Cars SET nobraukums='"+str(nobraukums)+ "'  WHERE id_user = 1 AND nosaukums = 'Filtri'")
+            sql = str("UPDATE Cars SET nobraukums='"+str(nobraukums)+ "'  WHERE id_user = '%d' AND nosaukums = 'Filtri'" % connection_user_id)
             con.execute(sql)
             con.commit()
 
             dateTd = datetime.datetime.today().strftime('%Y-%m-%d')
             dateTd = str(dateTd)
 
-            sql = str("UPDATE Cars SET datums='"+ dateTd + "'  WHERE id_user = 1 AND nosaukums = 'Filtri'")
+            sql = str("UPDATE Cars SET datums='"+ dateTd + "'  WHERE id_user = '%d' AND nosaukums = 'Filtri'" % connection_user_id)
             con.execute(sql)
             con.commit()
 
@@ -312,7 +280,7 @@ def filtriLogs():
 virsraksts3 = tk.Label(root, text="Gaisa filtru maiņa veikta:", justify='center',  font=fonts1, bg='#FFFFFF')
 virsraksts3.place( relx=0.05, rely=0.48)
 
-image4 = Image.open("aCmwIm9bEIS1.png")
+image4 = Image.open("Pictures/aCmwIm9bEIS1.png")
 resize_image4 = image4.resize((50, 50))
 img4 = ImageTk.PhotoImage(resize_image4)
 button3 = tk.Button(image=img4, command = lambda: filtriLogs())
@@ -339,7 +307,7 @@ def suportiLogs():
         SuportiZinojums.place(relheight=0.2, relwidth=0.7, relx =0.15, rely=0.15)
 
         with con:
-            data = con.execute("SELECT nobraukums FROM Cars WHERE id_user = 1 AND nosaukums = 'Suporti' ")
+            data = con.execute("SELECT nobraukums FROM Cars WHERE id_user = '%d' AND nosaukums = 'Suporti' " % connection_user_id)
             for row in data:
                 x = row[0]
 
@@ -350,7 +318,7 @@ def suportiLogs():
 
 
         with con:
-            data = con.execute("SELECT datums FROM Cars WHERE id_user = 1 AND nosaukums = 'Suporti' ")
+            data = con.execute("SELECT datums FROM Cars WHERE id_user = '%d' AND nosaukums = 'Suporti' " % connection_user_id)
             for row in data:
                 y = row[0]
         
@@ -376,14 +344,14 @@ def suportiLogs():
             atverts = 0
 
             nobraukums = SuportiRadijums.get()
-            sql = str("UPDATE Cars SET nobraukums='"+str(nobraukums)+ "'  WHERE id_user = 1 AND nosaukums = 'Suporti'")
+            sql = str("UPDATE Cars SET nobraukums='"+str(nobraukums)+ "'  WHERE id_user = '%d' AND nosaukums = 'Suporti'" % connection_user_id)
             con.execute(sql)
             con.commit()
 
             dateTd = datetime.datetime.today().strftime('%Y-%m-%d')
             dateTd = str(dateTd)
 
-            sql = str("UPDATE Cars SET datums='"+ dateTd + "'  WHERE id_user = 1 AND nosaukums = 'Suporti'")
+            sql = str("UPDATE Cars SET datums='"+ dateTd + "'  WHERE id_user = '%d' AND nosaukums = 'Suporti'" % connection_user_id)
             con.execute(sql)
             con.commit()
 
@@ -396,7 +364,7 @@ def suportiLogs():
 virsraksts4 = tk.Label(root, text="Bremžu suportu maiņa veikta:", justify='center',  font=fonts1, bg='#FFFFFF')
 virsraksts4.place( relx=0.05, rely=0.62)
 
-image5 = Image.open("aCmwIm9bEIS1.png")
+image5 = Image.open("Pictures/aCmwIm9bEIS1.png")
 resize_image5 = image5.resize((50, 50))
 img5 = ImageTk.PhotoImage(resize_image5)
 button4 = tk.Button(image=img5, command = lambda: suportiLogs())
@@ -422,7 +390,7 @@ def kluciLogs():
         KluciZinojums.place(relheight=0.2, relwidth=0.7, relx =0.15, rely=0.15)
 
         with con:
-            data = con.execute("SELECT nobraukums FROM Cars WHERE id_user = 1 AND nosaukums = 'Kluci' ")
+            data = con.execute("SELECT nobraukums FROM Cars WHERE id_user = '%d' AND nosaukums = 'Kluci' " % connection_user_id)
             for row in data:
                 x = row[0]
 
@@ -432,7 +400,7 @@ def kluciLogs():
         KluciIevade.place(relheight=0.05, relwidth=0.5, relx=0.25, rely=0.35)
 
         with con:
-            data = con.execute("SELECT datums FROM Cars WHERE id_user = 1 AND nosaukums = 'Kluci' ")
+            data = con.execute("SELECT datums FROM Cars WHERE id_user = '%d' AND nosaukums = 'Kluci' " % connection_user_id)
             for row in data:
                 y = row[0]
         
@@ -459,14 +427,14 @@ def kluciLogs():
             atverts = 0
 
             nobraukums = KluciRadijums.get()
-            sql = str("UPDATE Cars SET nobraukums='"+str(nobraukums)+ "'  WHERE id_user = 1 AND nosaukums = 'Kluci'")
+            sql = str("UPDATE Cars SET nobraukums='"+str(nobraukums)+ "'  WHERE id_user = '%d' AND nosaukums = 'Kluci'" % connection_user_id)
             con.execute(sql)
             con.commit()
 
             dateTd = datetime.datetime.today().strftime('%Y-%m-%d')
             dateTd = str(dateTd)
 
-            sql = str("UPDATE Cars SET datums='"+ dateTd + "'  WHERE id_user = 1 AND nosaukums = 'Kluci'")
+            sql = str("UPDATE Cars SET datums='"+ dateTd + "'  WHERE id_user = '%d' AND nosaukums = 'Kluci'" % connection_user_id)
             con.execute(sql)
             con.commit()
 
@@ -477,7 +445,7 @@ def kluciLogs():
 virsraksts5 = tk.Label(root, text="Bremžu kluču maiņa veikta:", justify='center',  font=fonts1, bg='#FFFFFF')
 virsraksts5.place( relx=0.05, rely=0.76)
 
-image6 = Image.open("aCmwIm9bEIS1.png")
+image6 = Image.open("Pictures/aCmwIm9bEIS1.png")
 resize_image6 = image6.resize((50, 50))
 img6 = ImageTk.PhotoImage(resize_image6)
 button6 = tk.Button(image=img6, command = lambda: kluciLogs())
@@ -502,7 +470,7 @@ def skidrumsLogs():
         SkidrumsZinojums.place(relheight=0.2, relwidth=0.7, relx =0.15, rely=0.15)
 
         with con:
-            data = con.execute("SELECT nobraukums FROM Cars WHERE id_user = 1 AND nosaukums = 'Skidrums' ")
+            data = con.execute("SELECT nobraukums FROM Cars WHERE id_user = '%d' AND nosaukums = 'Skidrums' " % connection_user_id)
             for row in data:
                 x = row[0]
 
@@ -513,7 +481,7 @@ def skidrumsLogs():
         SkidrumsIevade.place(relheight=0.05, relwidth=0.5, relx=0.25, rely=0.35)
 
         with con:
-            data = con.execute("SELECT datums FROM Cars WHERE id_user = 1 AND nosaukums = 'Skidrums' ")
+            data = con.execute("SELECT datums FROM Cars WHERE id_user = '%d' AND nosaukums = 'Skidrums' " % connection_user_id)
             for row in data:
                 y = row[0]
 
@@ -539,14 +507,14 @@ def skidrumsLogs():
             atverts = 0
 
             nobraukums = SkidrumsRadijums.get()
-            sql = str("UPDATE Cars SET nobraukums='"+str(nobraukums)+ "'  WHERE id_user = 1 AND nosaukums = 'Skidrums'")
+            sql = str("UPDATE Cars SET nobraukums='"+str(nobraukums)+ "'  WHERE id_user = '%d' AND nosaukums = 'Skidrums'" % connection_user_id)
             con.execute(sql)
             con.commit()
 
             dateTd = datetime.datetime.today().strftime('%Y-%m-%d')
             dateTd = str(dateTd)
 
-            sql = str("UPDATE Cars SET datums='"+ dateTd + "'  WHERE id_user = 1 AND nosaukums = 'Skidrums'")
+            sql = str("UPDATE Cars SET datums='"+ dateTd + "'  WHERE id_user = '%d' AND nosaukums = 'Skidrums'" % connection_user_id)
             con.execute(sql)
             con.commit()
 
@@ -557,7 +525,7 @@ def skidrumsLogs():
 virsraksts6 = tk.Label(root, text="Bremžu šķidruma maiņa veikta:", justify='center',  font=fonts1, bg='#FFFFFF')
 virsraksts6.place( relx=0.05, rely=0.89)
 
-image7 = Image.open("aCmwIm9bEIS1.png")
+image7 = Image.open("Pictures/aCmwIm9bEIS1.png")
 resize_image7 = image7.resize((50, 50))
 img7 = ImageTk.PhotoImage(resize_image7)
 button7 = tk.Button(image=img7, command = lambda: skidrumsLogs())
@@ -571,7 +539,7 @@ virsraksts6_2.place( relx=0.45, rely=0.93, relheight=0.05, relwidth=0.35)
 
 
 with con:
-    data = con.execute("SELECT nobraukums FROM Cars WHERE id_user = 1 AND nosaukums = 'Odometrs' ")
+    data = con.execute("SELECT nobraukums FROM Cars WHERE id_user = '%d' AND nosaukums = 'Odometrs' " % connection_user_id)
     for row in data:
         print(row[0])
 
@@ -580,10 +548,10 @@ with con:
 def parbaudeKM():
 
     #   Datu bāze:
-    con = sl.connect('my-test.db')
+    con = sl.connect('DB/my-test.db')
 
     with con:
-        data = con.execute("SELECT * FROM Cars")
+        data = con.execute("SELECT * FROM Cars WHERE id_user = '%d'" % connection_user_id)
         for row in data:
             i = row
             print(row)
@@ -867,6 +835,5 @@ def parbaudeKM():
 
 if __name__ == "__main__":
     parbaudeKM()
-
     # GUI beigas
     root.mainloop()

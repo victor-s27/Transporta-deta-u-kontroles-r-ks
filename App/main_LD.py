@@ -1,37 +1,12 @@
 import tkinter as tk
-from tkinter import W, PhotoImage, ttk, messagebox
-from tkinter import Canvas, Image
+from tkinter import ttk, messagebox
 from sqlite3 import *
-from cProfile import label
-import sqlite3 as sl
-import tkinter.filedialog as fd
 import tkinter as tk
-from tkinter import Canvas, Image
+from tkinter import Image
 from PIL import Image, ImageTk
+import os 
 
-connection = connect('my-test.db')
-
-# with connection:
-#     connection.execute("""
-#     CREATE TABLE Cars(
-#         id_user INTEGER,
-#         nosaukums TEXT, 
-#         nobraukums INTEGER,
-#         datums TEXT,
-#         CONSTRAINT user_fk FOREIGN KEY(id_user) REFERENCES Users(user_id)
-#     );
-#     """)
-
-# with connection:
-#     connection.execute("""
-#     CREATE TABLE Cars(
-#         id_user INTEGER,
-#         nosaukums TEXT, 
-#         nobraukums INTEGER,
-#         datums TEXT,
-#         CONSTRAINT user_fk FOREIGN KEY(id_user) REFERENCES Users(user_id)
-#     );
-#     """)
+connection = connect('DB/my-test.db')
 
 HEIGHT = 900
 WIDTH = 500
@@ -82,7 +57,7 @@ class StartPage(tk.Frame):
         canvas = tk.Canvas(self, height=HEIGHT, width=WIDTH)
         canvas.pack()
 
-        image = Image.open("backGround.png")
+        image = Image.open("Pictures/backGround.png")
         resize_image = image.resize((WIDTH, HEIGHT))
         img = ImageTk.PhotoImage(resize_image)
         labelBG = tk.Label(self, image=img)
@@ -95,6 +70,9 @@ class StartPage(tk.Frame):
         btn2 = tk.Button(self, text="Izveidot lietotāja profilu", command=lambda: controller.show_frame("RegisterPage"))
         btn2.place(relheight=0.05, relwidth=0.5, relx=0.25, rely=0.45)
 
+def confirmClicked():
+    window.destroy()
+    os.system('python App/lietotneLD.py')
 
 class RegisterPage(tk.Frame):
 
@@ -122,7 +100,7 @@ class RegisterPage(tk.Frame):
         canvas = tk.Canvas(self, height=HEIGHT, width=WIDTH)
         canvas.pack()
 
-        image = Image.open("backGround.png")
+        image = Image.open("Pictures/backGround.png")
         resize_image = image.resize((WIDTH, HEIGHT))
         img = ImageTk.PhotoImage(resize_image)
         labelBG = tk.Label(self, image=img)
@@ -200,11 +178,12 @@ class RegisterPage(tk.Frame):
                 ('%d' % row[0], 'Kluci', 0, "2022-03-22"),
                 ('%d' % row[0], 'Skidrums', 0, "2021-09-22")
                 ]
+                connection.execute("INSERT INTO Connection (id_user_connection) VALUES('%d')" % (row[0]))
             with connection:
                connection.executemany(sql, data)
-
-            return messagebox.showinfo("Reģistrācija", "Lietotājs tika reģistrēts!")
-
+            messagebox.showinfo("Reģistrācija", "Lietotājs tika reģistrēts!", icon = 'info')
+            confirmClicked()
+            
 class AuthorizePage(tk.Frame):
 
     ERROR = 'Error.TLabel'
@@ -229,7 +208,7 @@ class AuthorizePage(tk.Frame):
         canvas = tk.Canvas(self, height=HEIGHT, width=WIDTH)
         canvas.pack()
 
-        image = Image.open("backGround.png")
+        image = Image.open("Pictures/backGround.png")
         resize_image = image.resize((WIDTH, HEIGHT))
         img = ImageTk.PhotoImage(resize_image)
         labelBG = tk.Label(self, image=img)
@@ -291,7 +270,10 @@ class AuthorizePage(tk.Frame):
                     result = row[0]
                     user_num = result
             self.get_update("Lietotājs atrasts!", self.SUCCESS)
-            return messagebox.showinfo("Autorizācija", "Laipni lūdzam, %s!" % email)
+            with connection:
+                connection.execute("INSERT INTO Connection (id_user_connection) VALUES('%d')" % (user_num))
+            messagebox.showinfo("Autorizācija", "Laipni lūdzam, %s!" % email)
+            confirmClicked()
         elif email_copy != email:
             self.get_update("Lietotājs ar tādu e-pastu nav atrasts!", self.ERROR)
         else:
@@ -299,10 +281,5 @@ class AuthorizePage(tk.Frame):
 
 
 if __name__ == "__main__":
-    with connection:
-        result = connection.execute("SELECT * FROM Users, Cars WHERE user_id = 1")
-        for row in result:
-            print(row)
     window = MainPage()
-    
     window.mainloop()
